@@ -9,20 +9,22 @@
 	var marker;
       function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
-          center: {
-          	lat: -33.45694,  
-          	lng: -70.64827
-          },
+          center: (coords.scl),
           zoom: 9
         });
         marker = new google.maps.Marker({
-		 	position: map.center,
-		 	animation:google.maps.Animation.BOUNCE});
+			position: map.center
+		 });
       }
 
 // CLIMA
 	var url = 'https://api.darksky.net/forecast/';
 	var key = '6f3904234b64a9333355327168b9b104/';
+	var resumen = $('#resumen');
+	var apparent = $('#apparent');
+	var rain = $('#rain');
+	var humidity = $('#humidity');
+	var weatherIcon = $('#weather-icon');
 
 	var queryParams = ['exclude=[minutely,hourly,daily,alerts,flags]', 'lang=es', 'units=si']
 	var weatherIcon = {
@@ -45,19 +47,24 @@
 			method: 'GET'
 		}).then(function (data) {
 			console.log(data);
-			$('#resumen').text(parseInt(data.currently.temperature) + '° ' + data.currently.summary);
-			$('#apparent').text(data.currently.apparentTemperature + '°');
-			$('#rain').text(data.currently.precipProbability * 100 + '%');
-			$('#humidity').text(data.currently.humidity * 100 + '%');
-			$('#weather-icon').attr('src',weatherIcon[data.currently.icon]);
+			$(resumen).text(parseInt(data.currently.temperature) + '° ' + data.currently.summary);
+			$(apparent).text(data.currently.apparentTemperature + '°');
+			$(rain).text(data.currently.precipProbability * 100 + '%');
+			$(humidity).text(data.currently.humidity * 100 + '%');
+			$(weatherIcon).attr('src',weatherIcon[data.currently.icon]);
+			$('#escondido').removeAttr('hidden');
 		})
+
+		// MAP SELECT
 		 map.center = {
 		 	lat: coords[$(this).val()]['lat'],
 		 	lng: coords[$(this).val()]['lng']
 		 }
-		 map.setCenter(map.center);		 
-         marker.setMap(map);		 
+		 map.setCenter(map.center); 
+         marker.setMap(map);
          marker.setPosition(map.center);
+         marker.setAnimation(google.maps.Animation.BOUNCE);
+         map.setZoom(9);
 		 console.log(map.center);
 	})
 
