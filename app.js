@@ -5,28 +5,30 @@
 	}
 
 // MAPA
-	var map;
-	var marker;
-      function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: (coords.scl),
-          zoom: 9
-        });
-        marker = new google.maps.Marker({
-			position: map.center
-		 });
-      }
+	var map, marker;
+	function initMap(coord = coords.scl) {
+		map = new google.maps.Map(document.getElementById('map'), {
+			center: coord,
+			zoom: 9
+		});
+		marker = new google.maps.Marker({
+			position: coord,
+			// map: map
+		});
+
+
+	}
 
 // CLIMA
-	var url = 'https://api.darksky.net/forecast/';
-	var key = '6f3904234b64a9333355327168b9b104/';
-	var resumen = $('#resumen');
-	var apparent = $('#apparent');
-	var rain = $('#rain');
-	var humidity = $('#humidity');
-	var weatherIcon = $('#weather-icon');
-
-	var queryParams = ['exclude=[minutely,hourly,daily,alerts,flags]', 'lang=es', 'units=si']
+	var api_data = {
+		url: 'https://api.darksky.net/forecast/',
+		key: '6f3904234b64a9333355327168b9b104/',
+		queryParams: ['exclude=[minutely,hourly,daily,alerts,flags]', 'lang=es', 'units=si'],
+		get_queryParams: function(){
+			return this.queryParams.join('&')			
+		}
+	}
+	
 	var weatherIcon = {
 		'clear-day': 'images/clear-day.png',
 		'clear-night': 'images/clear-night.png',
@@ -42,28 +44,27 @@
 
 	$('#select').on('change', function (){
 		$.ajax ({
-			url: url + key + coords[$(this).val()]['lat'] + ',' + coords[$(this).val()]['lng'] + '?' + queryParams[0] + '&' + queryParams[1] + '&' + queryParams[2],
+			url: api_data.url + api_data.key + coords[$(this).val()]['lat'] + ',' + coords[$(this).val()]['lng'] + '?' + api_data.get_queryParams(),
 			dataType: 'jsonp',
 			method: 'GET'
 		}).then(function (data) {
 			console.log(data);
-			$(resumen).text(parseInt(data.currently.temperature) + '° ' + data.currently.summary);
-			$(apparent).text(data.currently.apparentTemperature + '°');
-			$(rain).text(data.currently.precipProbability * 100 + '%');
-			$(humidity).text(data.currently.humidity * 100 + '%');
-			$(weatherIcon).attr('src',weatherIcon[data.currently.icon]);
+			$('#resumen').text(parseInt(data.currently.temperature) + '° ' + data.currently.summary);
+			$('#apparent').text(data.currently.apparentTemperature + '°');
+			$('#rain').text(data.currently.precipProbability * 100 + '%');
+			$('#humidity').text(data.currently.humidity * 100 + '%');
+			$('#weather-icon').attr('src', weatherIcon[data.currently.icon]);
 			$('#escondido').removeAttr('hidden');
+
+			// initMap(coords[$(this).val()])
 		})
 
 		// MAP SELECT
-		 map.center = {
-		 	lat: coords[$(this).val()]['lat'],
-		 	lng: coords[$(this).val()]['lng']
-		 }
+		 map.center = coords[$(this).val()]
 		 map.setCenter(map.center); 
          marker.setMap(map);
          marker.setPosition(map.center);
-         marker.setAnimation(google.maps.Animation.BOUNCE);
+         marker.setAnimation(google.maps.Animation.BOUNCE);         
          map.setZoom(9);
 		 console.log(map.center);
 	})
