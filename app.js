@@ -25,7 +25,7 @@
 		key: '6f3904234b64a9333355327168b9b104/',
 		queryParams: ['exclude=[minutely,hourly,daily,alerts,flags]', 'lang=es', 'units=si'],
 		get_queryParams: function(){
-			return this.queryParams.join('&')			
+			return this.queryParams.join('&')		
 		}
 	}
 	
